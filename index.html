@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Chat Bot AI - YB Spa</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+        }
+        h1 { margin-bottom: 1rem; color: #333; }
+        p { color: #666; margin-bottom: 2rem; }
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.1s ease;
+            font-weight: 600;
+        }
+        button:active { transform: scale(0.98); }
+        
+        .btn-staff { background-color: #007bff; color: white; }
+        .btn-newbie { background-color: #28a745; color: white; }
+        .btn-reset { background-color: #dc3545; color: white; margin-top: 10px; }
+
+        .status {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 6px;
+            background-color: #e9ecef;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Môi trường Test Bot</h1>
+        <p>Chọn phiên bản Bot bạn muốn kiểm tra:</p>
+        
+        <div class="btn-group">
+            <button class="btn-staff" onclick="switchBot('staff')">Staff Chính Thức</button>
+            <button class="btn-newbie" onclick="switchBot('newbie')">Staff Thực Tập</button>
+            <button class="btn-staff" onclick="switchBot('demo')" style="background-color: #6f42c1;">Demo Khách Hàng</button>
+        </div>
+
+        <div id="current-status" class="status">
+            Trạng thái: Chưa tải bot nào
+        </div>
+        
+        <div style="margin-top: 10px;">
+            <button class="btn-reset" onclick="switchBot('none')">Reset / Xóa Bot</button>
+        </div>
+    </div>
+
+    <script>
+        const scripts = {
+            staff: "https://chat-bot-ybspa.3docorp.vn/api/yb-spa/chat-bot/staff?api_key=$2y$10$zI97n4Dywxq5sby6QTydse5k&shop_identity_key=Zt6FqL9sVb2Hk3NwP4xR7eT0uJ8!aC5yD1QfGzM",
+            newbie: "https://chat-bot-ybspa.3docorp.vn/api/yb-spa/chat-bot/newbie?api_key=$2y$10$zI97n4Dywxq5sby6QTydse5k&shop_identity_key=Zt6FqL9sVb2Hk3NwP4xR7eT0uJ8!aC5yD1QfGzM",
+            demo: "https://chat-bot-ybspa.3docorp.vn/api/yb-spa/chat-bot/customer?api_key=$2y$10$zI97n4Dywxq5sby6QTydse5k&shop_identity_key=Zt6FqL9sVb2Hk3NwP4xR7eT0uJ8!aC5yD1QfGzM"
+        };
+
+        function switchBot(type) {
+            const url = new URL(window.location.href);
+            if (type === 'none') {
+                url.searchParams.delete('bot');
+            } else {
+                url.searchParams.set('bot', type);
+            }
+            window.location.href = url.toString();
+        }
+        window.onload = function() {
+            const params = new URLSearchParams(window.location.search);
+            const botType = params.get('bot');
+            const statusDiv = document.getElementById('current-status');
+
+            if (botType && scripts[botType]) {
+                const scriptTag = document.createElement('script');
+                scriptTag.src = scripts[botType];
+                scriptTag.async = true; 
+                document.body.appendChild(scriptTag);
+
+                const botNames = {
+                    staff: 'Staff Chính Thức',
+                    newbie: 'Staff Thực Tập',
+                    demo: 'Khách Hàng'
+                };
+                const botColors = {
+                    staff: { bg: '#cce5ff', text: '#004085' },
+                    newbie: { bg: '#d4edda', text: '#155724' },
+                    demo: { bg: '#e7d6f5', text: '#4a148c' }
+                };
+                statusDiv.innerHTML = `Đang chạy: <strong>${botNames[botType] || botType}</strong>`;
+                statusDiv.style.backgroundColor = botColors[botType]?.bg || '#e9ecef';
+                statusDiv.style.color = botColors[botType]?.text || '#333';
+            } else {
+                statusDiv.innerHTML = "Trạng thái: Chưa tải bot nào (Bot Off)";
+            }
+        };
+    </script>
+</body>
+</html>
